@@ -2,7 +2,7 @@ CC=gcc
 BIN=./bin
 CFLAGS=-Wall -g -pthread -lm
 
-PROG=glob ph philo buf sem_open sem_wait sem_post sem_unlink sem_getvalue
+PROG=glob ph philo buf peluquero sem_open sem_wait sem_post sem_unlink sem_getvalue
 
 LIST=$(addprefix $(BIN)/, $(PROG))
 
@@ -17,4 +17,4 @@ $(BIN)/%: %.c
 
 .PHONY: clean
 clean:
-	rm -f $(BIN)/ej* $(BIN)/hola $(BIN)/sh
+	rm -f $(BIN)/glob $(BIN)/ph $(BIN)/philo $(BIN)/buf $(BIN)/peluquero $(BIN)/sem_*
