@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.line-block{white-space: pre-line;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="laboratorio-4---sincronización">Laboratorio 4 - Sincronización</h1>
+<p><strong>Nota</strong>: Pueden escribir las respuestas a las preguntas en el archivo <code>resultados.txt</code>.</p>
+<h2 id="ejercicio-1">Ejercicio 1</h2>
+<p>El programa <code>glob.c</code> crea dos hilos que incrementan repetidamente la variable global <code>glob</code>. Esto lo realizan copiando primero el valor de <code>glob</code> en una variable automática (local) del hilo, luego incrementando el valor de la variable local, y finalmente copiando el nuevo valor en <code>glob</code>. Cada hilo incrementa <code>glob</code> el número de veces indicado en la línea de comandos.</p>
+<ul>
+<li>Compilar y ejecutar el programa, probando valores hasta que se encuentre una <em>condición de carrera</em>.</li>
+<li>¿Por qué ocurre esta situación de carrera? ¿Cómo se podría evitar?</li>
+<li>Evitar la condición de carrera mediante el uso de un <em>mutex</em> (<code>pthread_mutex_t</code>). Utilizar un <em>mutex</em> inicializado estáticamente, con <code>PTHREAD_MUTEX_INITIALIZER</code>. Para tomar y liberar el <em>mutex</em>, usar las funciones <code>pthread_mutex_lock()</code> y <code>pthread_mutex_unlock()</code> respectivamente.</li>
+</ul>
+<h2 id="ejercicio-2">Ejercicio 2</h2>
+<p>Completar los siguientes programas:</p>
+<ul>
+<li><code>sem_open.c</code>: crea un semáforo, con el nombre indicado como parámetro.</li>
+<li><code>sem_wait.c</code>: realiza una operación <em>down</em> sobre el semáforo indicado.</li>
+<li><code>sem_post.c</code>: realiza una operación <em>up</em> sobre el semáforo indicado.</li>
+<li><code>sem_getvalue.c</code>: imprime el valor del semáforo indicado.</li>
+<li><code>sem_unlink.c</code>: elimina el semáforo indicado.</li>
+</ul>
+<p>Se deben utilizar las siguientes funciones:</p>
+<ul>
+<li><code>sem_open()</code>: abre o crea un semáforo.</li>
+<li><code>sem_post()</code>: realiza una operación up sobre el semáforo.</li>
+<li><code>sem_wait()</code>: realiza una operación down sobre el semáforo.</li>
+<li><code>sem_getvalue()</code>: obtiene el valor actual de un semáforo.</li>
+<li><code>sem_close()</code>: cierra un semáforo.</li>
+<li><code>sem_unlink()</code>: elimina un semáforo del sistema.</li>
+</ul>
+<p>Una vez completados los programas, tendrían que poder ejecutar la siguiente serie de comandos: primero, se crea un semáforo con un valor inicial de cero. Luego, se realiza una operación <em>down</em>, luego un <em>up</em>, y finalmente se lo elimina.</p>
+<pre><code>$ sem_open /semaforo 0
+$ sem_wait /semaforo &amp;
+$ sem_post /semaforo
+$ sem_unlink /semaforo
+</code></pre>
+<p>Responder:</p>
+<ol>
+<li>¿Qué es lo que sucede con el proceso que ejecuta <code>sem_wait</code>, en el segundo comando?</li>
+</ol>
+<h2 id="ejercicio-3">Ejercicio 3</h2>
+<p>El programa <code>buf.c</code> implementa un ejemplo del problema del productor-consumidor, haciendo uso de un <em>buffer limitado</em>. El programa no utiliza mecanismos de sincronización para el acceso al <em>buffer</em>. Esto puede ocasionar problemas, por ejemplo una condición de carrera. Modificar el programa para sincronizar el acceso al recurso compartido (el <em>buffer</em>) por parte de los hilos productor y consumidor, empleando semáforos y <em>mutexs</em>. En este ejercicio, y en los que siguen, crear los <em>mutexs</em> necesarios con la funcion <code>pthread_mutex_init()</code>.</p>
+<h2 id="ejercicio-4">Ejercicio 4</h2>
+<p>El programa <code>philo.c</code> implementa un ejemplo del problema de la <em>cena de los filósofos</em>. Durante la ejecución del programa puede ocurrir una condición de carrera.</p>
+<ol>
+<li>Modificar el programa para evitar esta condición, mediante el uso de semáforos y mutexes.</li>
+<li>Agregar también una solución para evitar el <em>bloqueo mutuo</em> o <em>abrazo mortal</em>. Explicarla.</li>
+</ol>
+<h2 id="ejercicio-5">Ejercicio 5</h2>
+<p>Modificado de: <a href="https://pdos.csail.mit.edu/6.828/2017/homework/lock.html" class="uri">https://pdos.csail.mit.edu/6.828/2017/homework/lock.html</a></p>
+<p>En este ejercicio exploraremos la programación paralela, utilizando hilos, exclusión mutua y una tabla <em>hash</em>. Para lograr un paralelismo real, se debe ejecutar este programa en una computadora con dos o más núcleos.</p>
+<p>En primer lugar, compilar y ejecutar el programa <code>ph.c</code>:</p>
+<pre><code>$ make ph
+$ bin/ph 2
+</code></pre>
+<p>El número 2 especifica el número de hilos que realizaran operaciones <em>put</em> y <em>get</em> sobre una tabla <em>hash</em>. Cuando termine de ejecutar, el programa debe generar una salida similar a la siguiente:</p>
+<pre><code>0: put time = 2.871728
+1: put time = 2.957073
+1: get time = 12.731078
+1: 1 keys missing
+0: get time = 12.731874
+0: 1 keys missing
+completion time = 15.689165
+</code></pre>
+<p>Cada hilo ejecuta dos fases. En la primera, almacena claves en la tabla, y en la segunda fase trata de recuperar dichas claves de la tabla. La salida del programa indica cuanto tiempo duro cada fase para cada hilo. La última linea (&quot;<em>completion time</em>&quot;) indica el tiempo total de ejecución del programa. En la salida de ejemplo anterior, el programa ejecutó durante aproximadamente 16 segundos.</p>
+<p>Por ejemplo, si ejecutaramos nuevamente el programa, pero con un único hilo:</p>
+<pre><code>$ bin/ph 1
+0: put time = 5.350298
+0: get time = 11.690395
+0: 0 keys missing
+completion time = 17.040894
+</code></pre>
+<p>El tiempo total de ejecución es levemente mayor que para el caso de ejecución con dos hilos (~17s contra ~15.6s), aunque podría ser también levemente menor. Sin embargo, notar que al utilizar dos hilos se realizó el doble de trabajo en la fase <em>get</em>, lo que representa un mejora de casi 2x (¡nada mal!). En cambio, para la fase <em>put</em> se logró una mejora mucho más pequeña, ya que entre ambos hilos guardaron el mismo número de claves en algo menos de la mitad de tiempo (~2.9s contra ~5.3s).</p>
+<p>Independientemente de si al ejecutar el programa logran un incremento de velocidad, o la magnitud del mismo, notarán que el programa <strong>no funciona correctamente</strong>. Al ejecutarlo utilizando dos o más hilos, algunas claves posiblemente no puedan ser recuperadas. En el ejemplo anterior, una de las claves se perdió (&quot;<em>1 keys missing</em>&quot;).</p>
+<p>Esto empeora cuando incrementamos el número de hilos:</p>
+<pre><code>$ bin/ph 4
+2: put time = 1.516581
+1: put time = 1.529754
+0: put time = 1.816878
+3: put time = 2.113230
+2: get time = 15.635937
+2: 21 keys missing
+3: get time = 15.694796
+3: 21 keys missing
+1: get time = 15.714341
+1: 21 keys missing
+0: get time = 15.746386
+0: 21 keys missing
+completion time = 17.866878
+</code></pre>
+<p>Dos consideraciones:</p>
+<ul>
+<li>El tiempo total de ejecución es aproxidamente el mismo que para el caso de dos hilos. Sin embargo, se realizó casi el doble de operaciones <em>get</em>, lo que indica que se esta obteniendo una buena paralelización.</li>
+<li>Más claves se han perdido. Es posible, sin embargo, que en una ejecución particular se pierdan más o menos claves, o incluso que no se pierda ninguna.</li>
+</ul>
+<p>Para evitar la pérdida de claves, es necesario emplear <em>exclusión mutua</em>, durante las operaciones <em>put</em> y <em>get</em>. Las funciones a utilizar son:</p>
+<pre><code>pthread_mutex_t lock;     // declare a lock
+pthread_mutex_init(&amp;lock, NULL);   // initialize the lock
+pthread_mutex_lock(&amp;lock);  // acquire lock
+pthread_mutex_unlock(&amp;lock);  // release lock
+</code></pre>
+<p>Se pide:</p>
+<ol>
+<li>Identificar la secuencia de eventos que pueden llevar a que se pierda una clave en el caso de dos o más hilos.</li>
+<li>Modificar el código del programa de manera que no se pierdan claves al utilizar dos o más hilos. ¿Es aún la versión de dos hilos más rápida que la versión con un único hilo? De no ser así, ¿por qué?</li>
+<li>Modificar el código para que las operaciones <em>get</em> puedan ejecutarse en paralelo. (Tip: ¿Es necesario utilizar exclusión mútua al realizar una operación <em>get</em>?)</li>
+<li>Modificar el código para que algunas de las operaciones <em>put</em> puedan ejecutar en paralelo.</li>
+</ol>
+<h2 id="ejercicio-6-opcional">Ejercicio 6 (Opcional)</h2>
+<p>Un problema clásico de IPC es el problema del peluquero dormido. Una peluquería tiene <em>n</em> peluqueros, y <em>m</em> sillas donde los clientes esperan su turno. Si no hay clientes, los peluqueros duermen (se <em>bloquean</em>). Cuando arriba un cliente, alguno de los peluqueros se despierta, y realiza el corte de pelo. Si todos los peluqueros estuvieran ocupados, y hubiera sillas disponibles, el cliente se sienta a esperar su turno (es decir, se <em>bloquea</em> a la espera de su turno). Caso contrario, se retira. Implementar en <code>peluquero.c</code> un ejemplo de este problema. Emplear semáforos para manejar <strong>sincronización</strong> y <em>mutexs</em> para garantizar la <strong>exclusión mutua</strong>.</p>
+<hr />
+<p>¡Fin del Laboratorio 4!</p>
+</body>
+</html>
